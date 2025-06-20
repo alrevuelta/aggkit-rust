@@ -1,0 +1,12 @@
+# Compiler files
+cache/
+out/
+
+# Dotenv file
+.env
+
+target
+
+db
+
+**DS_Store
