@@ -91,7 +91,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         .iter()
         .map(|l2_rpc| {
             Indexer::new(
-                l1_rpc_url.clone(),
+                l2_rpc.rpc_url.clone(),
                 format!("l2-bridge-indexer-aggchain-{}", l2_rpc.aggchain_id),
                 bridge_address,
                 BlockNumberOrTag::Latest,

@@ -59,6 +59,8 @@ impl<P: EventProcessor + Send + Sync + 'static> Indexer<P> {
 
         let latest_processed_block = event_processor.latest_processed_block()?;
 
+        println!("[{}] rpc_url: {:?}", name, rpc_url);
+
         println!(
             "[{}] latest_processed_block: {:?}",
             name, latest_processed_block
