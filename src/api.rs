@@ -52,11 +52,15 @@ struct TreeSyncStatus {
 
 #[derive(Serialize)]
 struct ClaimProofResponse {
-    //l1_info_tree_leaf: L1InfoLeaf,
-    mer: B256,
-    rer: B256,
-    proof_local_exit_root: [String; DEPTH], // TODO: Use proper types
-    proof_rollup_exit_root: [String; DEPTH],
+    proof: Proof,
+}
+
+#[derive(Serialize)]
+struct Proof {
+    merkle_proof: Vec<String>, // TODO: Use proper types
+    rollup_merkle_proof: Vec<String>,
+    main_exit_root: String,
+    rollup_exit_root: String,
 }
 
 #[derive(Clone)]
@@ -144,7 +148,9 @@ async fn sync_status(State(state): State<AppState>) -> impl IntoResponse {
 
 #[derive(Deserialize, Debug)]
 struct ClaimProofParams {
+    #[serde(rename = "net_id")] // Updated query parameter name
     network_id: u32,
+    #[serde(rename = "deposit_cnt")] // Updated query parameter name
     deposit_count: u64,
 }
 
@@ -180,10 +186,12 @@ async fn claim_proof(
     }
 
     let response = ClaimProofResponse {
-        mer: mer.unwrap(),
-        rer: rer.unwrap(),
-        proof_local_exit_root: ler_proof.map(|byte| format!("0x{:02x}", byte)),
-        proof_rollup_exit_root: rer_proof.map(|byte| format!("0x{:02x}", byte)),
+        proof: Proof {
+            merkle_proof: ler_proof.map(|byte| format!("0x{:02x}", byte)).to_vec(),
+            rollup_merkle_proof: rer_proof.map(|byte| format!("0x{:02x}", byte)).to_vec(),
+            main_exit_root: format!("0x{:02x}", mer.unwrap()),
+            rollup_exit_root: format!("0x{:02x}", rer.unwrap()),
+        },
     };
 
     axum::Json(response)
@@ -193,7 +201,7 @@ pub async fn run_server(state: AppState) -> Result<(), Box<dyn Error + Send + Sy
     let server_task = tokio::spawn(async move {
         let app = Router::new()
             .route("/sync-status", get(sync_status))
-            .route("/claim-proof", get(claim_proof))
+            .route("/merkle-proof", get(claim_proof))
             .with_state(state);
 
         let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;

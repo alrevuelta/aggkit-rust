@@ -18,7 +18,8 @@ Run as follows. This will index the L1InfoTree and both L1 + L2 (1=PolygonZKEVM)
 ```
 cargo run -- \
 --l1-rpc-url="https://mainnet.gateway.tenderly.co/YOU_API_KEY" \
---l2-rpc-url="1:https://zkevm-rpc.com"
+--l2-rpc-url="1:https://zkevm-rpc.com" \
+--l2-rpc-url="20:https://rpc.katanarpc.com"
 ```
 
 Mainnet addresses are hardcoded, but you can configure `--ger-address`, `--bridge-address` and `--rollup-manager-address`. For help:
@@ -34,5 +35,5 @@ curl "http://localhost:3000/sync-status"
 
 Get Merkle proofs to claim a deposit.
 ```
-curl "http://localhost:3000/claim-proof?network_id=0&deposit_count=133"
+curl "http://localhost:3000/merkle-proof?deposit_cnt=15&net_id=20"
 ```
