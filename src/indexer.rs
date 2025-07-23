@@ -2,7 +2,9 @@ use alloy::primitives::{Address, B256};
 use alloy::providers::Provider;
 use alloy::rpc::types::Filter;
 use alloy::rpc::types::{BlockNumberOrTag, Log};
+use alloy::transports::TransportError;
 use alloy::transports::http::reqwest::Url;
+use alloy::transports::layers::RetryPolicy;
 use alloy::{
     providers::ProviderBuilder, rpc::client::RpcClient, transports::layers::RetryBackoffLayer,
 };
@@ -19,6 +21,22 @@ use tokio::time::sleep;
 
 // TODO:
 // - Handle sigterm gracefully.
+
+#[derive(Debug, Copy, Clone, Default)]
+#[non_exhaustive]
+pub struct AlwaysRetryPolicy;
+
+impl RetryPolicy for AlwaysRetryPolicy {
+    fn should_retry(&self, error: &TransportError) -> bool {
+        // TODO: Be more granular with the retry policy.
+        // we don't want to retry in some cases.
+        true
+    }
+
+    fn backoff_hint(&self, error: &TransportError) -> Option<std::time::Duration> {
+        None
+    }
+}
 
 #[async_trait]
 pub trait EventProcessor: Send + Sync + 'static {
@@ -70,13 +88,13 @@ impl<P: EventProcessor + Send + Sync + 'static> Indexer<P> {
             None => 0,
         };
 
+        let retry_policy =
+            RetryBackoffLayer::new_with_policy(max_retry, backoff, cups, AlwaysRetryPolicy);
+
         // Uses middleware to retry on rate limit errors.
         let provider = Arc::new(
-            ProviderBuilder::new().connect_client(
-                RpcClient::builder()
-                    .layer(RetryBackoffLayer::new(max_retry, backoff, cups))
-                    .http(rpc_url),
-            ),
+            ProviderBuilder::new()
+                .connect_client(RpcClient::builder().layer(retry_policy).http(rpc_url)),
         );
 
         Ok(Self {
