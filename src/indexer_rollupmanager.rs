@@ -30,33 +30,15 @@ impl EventProcessor for RollupManagerEventProcessor {
             match event.topic0() {
                 Some(&CreateNewRollup::SIGNATURE_HASH) => {
                     let event = event.log_decode::<CreateNewRollup>()?;
-                    self.tree.set_rollup_leaf(
-                        event.data().rollupID,
-                        &B256::default(),
-                        event
-                            .block_number
-                            .ok_or(eyre::eyre!("Block number not found"))?,
-                    )?;
+                    // TODO:
                 }
                 Some(&AddExistingRollup::SIGNATURE_HASH) => {
                     let event = event.log_decode::<AddExistingRollup>()?;
-                    self.tree.set_rollup_leaf(
-                        event.data().rollupID,
-                        &B256::default(),
-                        event
-                            .block_number
-                            .ok_or(eyre::eyre!("Block number not found"))?,
-                    )?;
+                    // TODO:
                 }
                 Some(&AddExistingRollupOld::SIGNATURE_HASH) => {
                     let event = event.log_decode::<AddExistingRollupOld>()?;
-                    self.tree.set_rollup_leaf(
-                        event.data().rollupID,
-                        &B256::default(),
-                        event
-                            .block_number
-                            .ok_or(eyre::eyre!("Block number not found"))?,
-                    )?;
+                    // TODO:
                 }
                 Some(&VerifyBatchesTrustedAggregator::SIGNATURE_HASH) => {
                     let event = event.log_decode::<VerifyBatchesTrustedAggregator>()?;

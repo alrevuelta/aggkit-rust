@@ -78,7 +78,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         l1_rpc_url.clone(),
         "l1-bridge-indexer".to_string(),
         bridge_address,
-        BlockNumberOrTag::Latest,
+        BlockNumberOrTag::Finalized,
         BridgeEventProcessor {
             tree: Arc::clone(&trees),
             aggchain_id: 0,
@@ -95,7 +95,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                 l2_rpc.rpc_url.clone(),
                 format!("l2-bridge-indexer-aggchain-{}", l2_rpc.aggchain_id),
                 bridge_address,
-                BlockNumberOrTag::Latest,
+                BlockNumberOrTag::Finalized,
                 BridgeEventProcessor {
                     tree: Arc::clone(&trees),
                     aggchain_id: l2_rpc.aggchain_id,
@@ -109,7 +109,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         l1_rpc_url.clone(),
         "rollup-manager-indexer".to_string(),
         rollup_manager_address,
-        BlockNumberOrTag::Latest,
+        BlockNumberOrTag::Finalized,
         RollupManagerEventProcessor {
             tree: Arc::clone(&trees),
         },
@@ -120,7 +120,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         l1_rpc_url.clone(),
         "l1infotree-indexer".to_string(),
         ger_address,
-        BlockNumberOrTag::Latest,
+        BlockNumberOrTag::Finalized,
         L1InfoTreeEventProcessor {
             tree: Arc::clone(&trees),
             provider: l1_provider.clone(),
