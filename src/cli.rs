@@ -70,4 +70,9 @@ pub struct Cli {
     /// Example: 0x5132A183E9F3CB7C848b0AAC5Ae0c4f0491B7aB2
     #[arg(long, default_value = "0x5132A183E9F3CB7C848b0AAC5Ae0c4f0491B7aB2")]
     pub rollup_manager_address: String,
+
+    /// Number of blocks to query in a single request.
+    /// Lower values help avoid RPC timeouts but may slow down indexing.
+    #[arg(long, default_value = "10000")]
+    pub block_range: u64,
 }

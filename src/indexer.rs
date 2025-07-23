@@ -46,13 +46,12 @@ impl<P: EventProcessor + Send + Sync + 'static> Indexer<P> {
         contract_address: Address,
         sync_mode: BlockNumberOrTag,
         event_processor: P,
+        block_range: u64,
     ) -> Result<Self, eyre::Report> {
         // TODO: Maybe pass the provider instead of the url to each type?
         let max_retry: u32 = 100;
         let backoff: u64 = 2000;
         let cups: u64 = 100;
-
-        let block_range: u64 = 10_000;
         let parallel_queries: usize = 5;
         let max_queue_size: usize = 100;
         let poll_interval: u64 = 3;

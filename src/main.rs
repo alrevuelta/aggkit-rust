@@ -83,6 +83,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             tree: Arc::clone(&trees),
             aggchain_id: 0,
         },
+        cli.block_range,
     )?;
 
     // Create one indexer per configured L2 RPC, using aggchain_id in the name
@@ -99,6 +100,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                     tree: Arc::clone(&trees),
                     aggchain_id: l2_rpc.aggchain_id,
                 },
+                cli.block_range,
             )
         })
         .collect::<Result<_, _>>()?;
@@ -111,6 +113,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         RollupManagerEventProcessor {
             tree: Arc::clone(&trees),
         },
+        cli.block_range,
     )?;
 
     let l1infotree_indexer = Indexer::new(
@@ -122,6 +125,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             tree: Arc::clone(&trees),
             provider: l1_provider.clone(),
         },
+        cli.block_range,
     )?;
 
     let handle_l1_bridge_indexer = task::spawn(l1_bridge_indexer.run());
