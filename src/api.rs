@@ -1,5 +1,6 @@
 use crate::contracts::PolygonZkEVMBridgeV2::PolygonZkEVMBridgeV2Instance;
 use crate::contracts::PolygonZkEVMGlobalExitRootV2::PolygonZkEVMGlobalExitRootV2Instance;
+use crate::db::{BridgeFilters, BridgeRecord, Database};
 use crate::merkle_tree::MerkleForest;
 use crate::merkle_tree::TreeType;
 use alloy::primitives::B256;
@@ -70,6 +71,7 @@ pub struct AppState {
     pub l1_bridge: PolygonZkEVMBridgeV2Instance<ProviderStack>,
     pub l2_bridges: HashMap<u32, PolygonZkEVMBridgeV2Instance<ProviderStack>>,
     pub l1_infotree: PolygonZkEVMGlobalExitRootV2Instance<ProviderStack>,
+    pub db: Database,
     //pub rollup_manager: PolygonRollupManagerInstance<ProviderStack>, Not needed?
 }
 
@@ -197,11 +199,40 @@ async fn claim_proof(
     axum::Json(response)
 }
 
+#[derive(Serialize)]
+pub struct BridgesResult {
+    pub deposits: Vec<BridgeRecord>,
+    pub total_cnt: i64,
+}
+
+async fn get_bridges(
+    State(state): State<AppState>,
+    Query(params): Query<BridgeFilters>,
+) -> impl IntoResponse {
+    // TODO: If the request is for a network_id not being indexed, error out.
+    match state.db.get_bridges(params).await {
+        Ok((deposits, total_cnt)) => axum::Json(BridgesResult {
+            deposits,
+            total_cnt,
+        })
+        .into_response(),
+        Err(err) => {
+            eprintln!("Error retrieving bridges: {err}");
+            (
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                "internal error",
+            )
+                .into_response()
+        }
+    }
+}
+
 pub async fn run_server(state: AppState) -> Result<(), Box<dyn Error + Send + Sync>> {
     let server_task = tokio::spawn(async move {
         let app = Router::new()
             .route("/sync-status", get(sync_status))
             .route("/merkle-proof", get(claim_proof))
+            .route("/bridges", get(get_bridges))
             .with_state(state);
 
         let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;

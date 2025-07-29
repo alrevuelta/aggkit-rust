@@ -36,3 +36,5 @@ async-trait = "0.1.88"
 clap = { version = "4.0", features = ["derive"] }
 
 axum = "0.8.4"
+sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "sqlite"] }
+hex = "0.4"

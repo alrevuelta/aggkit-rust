@@ -53,8 +53,13 @@ pub struct Cli {
 
     /// Path for the key-value store storing the merkle tree.
     /// Example: db
-    #[arg(long, default_value = "db")]
+    #[arg(long, default_value = "rocksdb")]
     pub key_value_store: String,
+
+    /// Path for the SQLite database storing the bridge events.
+    /// Example: sqlite://bridge_events.db
+    #[arg(long, default_value = "sqlite://sqlite.db")]
+    pub db_path: String,
 
     /// Contract address of the PolygonZkEVMGlobalExitRootV2.
     /// Example: 0x580bda1e7A0CFAe92Fa7F6c20A3794F169CE3CFb

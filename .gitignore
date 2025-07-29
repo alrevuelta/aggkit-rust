@@ -7,6 +7,13 @@ out/
 
 target
 
+sqlite.db
+
+sqlite.db-shm
+sqlite.db-wal
+
 db
+
+rocksdb
 
 **DS_Store

@@ -2,6 +2,7 @@ use aggkit_rust::api::{AppState, ProviderStack, run_server};
 use aggkit_rust::cli::Cli;
 use aggkit_rust::contracts::PolygonZkEVMBridgeV2::{self, PolygonZkEVMBridgeV2Instance};
 use aggkit_rust::contracts::{PolygonRollupManager, PolygonZkEVMGlobalExitRootV2};
+use aggkit_rust::db::Database;
 use aggkit_rust::indexer::Indexer;
 use aggkit_rust::indexer_bridge::BridgeEventProcessor;
 use aggkit_rust::indexer_l1infotree::L1InfoTreeEventProcessor;
@@ -72,6 +73,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         rollup_manager_address
     );
 
+    let db = Database::new(&cli.db_path).await?;
     let trees = Arc::new(MerkleForest::open(key_value_store)?);
 
     let l1_bridge_indexer = Indexer::new(
@@ -82,6 +84,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         BridgeEventProcessor {
             tree: Arc::clone(&trees),
             aggchain_id: 0,
+            db: db.clone(),
         },
         cli.block_range,
     )?;
@@ -99,6 +102,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                 BridgeEventProcessor {
                     tree: Arc::clone(&trees),
                     aggchain_id: l2_rpc.aggchain_id,
+                    db: db.clone(),
                 },
                 cli.block_range,
             )
@@ -169,6 +173,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         l1_bridge: l1_bridge,
         l2_bridges: l2_bridges,
         l1_infotree: l1_infotree,
+        db: db.clone(),
         //rollup_manager: rollup_manager,
     };
     let handle_api = task::spawn(run_server(state));
