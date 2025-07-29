@@ -28,13 +28,17 @@ impl Database {
 
         let db = SqlitePool::connect(database_url).await.unwrap();
 
+        // Create tables if they don't exist yet.
+        let db = Self { pool: Arc::new(db) };
+        db.create_tables().await?;
+
         /* TODO: Have a look into this.
         let pool = SqlitePoolOptions::new()
             .max_connections(5)
             .connect(database_url)
             .await?;*/
 
-        Ok(Self { pool: Arc::new(db) })
+        Ok(db)
     }
 
     // TODO: Unoptimized, create INDEX, etc.

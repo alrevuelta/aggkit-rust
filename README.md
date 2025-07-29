@@ -2,10 +2,11 @@
 
 Proof of concept implementation of aggkit in Rust. Barely tested and not meant for production use.
 
-## Features
+## Features
 
 Covered features:
 - [x] aggbridge
+- [x] l1infotree indexer
 - [ ] aggsender
 - [ ] aggoracle
 
@@ -16,7 +17,7 @@ Important stuff:
 * Stores bridge exits in an SQLite database.
 * Allows indexing an arbitrary number of chains. Pass as many `--l2-rpc-url` as you like.
 
-## Run
+## Run
 
 Run as follows. This will index the L1InfoTree and both L1 + L2 (1=PolygonZKEVM) bridges. It does so in around 8 minutes.
 ```
@@ -42,24 +43,31 @@ curl "http://localhost:3000/sync-status"
 ```
 
 `merkle-proof`
+
 Get Merkle proofs to claim a deposit.
 ```
 curl "http://localhost:3000/merkle-proof?deposit_cnt=15&net_id=20"
 ```
 
 `bridges`
-Get the bridge exits.
 
-```
-curl -s "http://localhost:3000/bridges"
-```
+Get the bridge exits of a given network. Note that the `network_id` parameter is mandatory.
 
+Get all bridge events that started in `network_id=0`. It returns an array with them in `deposits` and `total_cnt`. See paging.
 ```
-curl -s "http://localhost:3000/bridges?orig_addr=0x2C24B57e2CCd1f273045Af6A5f632504C432374F"
+curl "http://localhost:3000/bridges?network_id=0"
 ```
 
-// TODO: add paging.
+You can use paging as follows. The `deposit_cnt` is used for ordering, ascending.
 
-its destination address.
-https://bridge-api.zkevm-rpc.com/bridges/0xCE27d8BCee45dB3E457EcF8629264Ca7893AAaAc?tx_hash=0xb6d5b7c68c0fe03296f40d5338749169810d7b0cbfc056dbd2425201cbe1f7bc
+```
+curl "http://localhost:3000/bridges?network_id=0&page_number=1&page_size=2"
+```
 
+Get all bridges with a given origin_addr.
+
+```
+curl "http://localhost:3000/bridges?network_id=0&dest_addr=0xCE27d8BCee45dB3E457EcF8629264Ca7893AAaAc"
+```
+
+All the fields present in the response can be used for filtering.

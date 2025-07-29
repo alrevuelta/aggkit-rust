@@ -201,8 +201,8 @@ async fn claim_proof(
 
 #[derive(Serialize)]
 pub struct BridgesResult {
-    pub bridges: Vec<BridgeRecord>,
-    pub count: i64,
+    pub deposits: Vec<BridgeRecord>,
+    pub total_cnt: i64,
 }
 
 async fn get_bridges(
@@ -211,7 +211,11 @@ async fn get_bridges(
 ) -> impl IntoResponse {
     // TODO: If the request is for a network_id not being indexed, error out.
     match state.db.get_bridges(params).await {
-        Ok((bridges, count)) => axum::Json(BridgesResult { bridges, count }).into_response(),
+        Ok((deposits, total_cnt)) => axum::Json(BridgesResult {
+            deposits,
+            total_cnt,
+        })
+        .into_response(),
         Err(err) => {
             eprintln!("Error retrieving bridges: {err}");
             (
