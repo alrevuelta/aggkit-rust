@@ -7,6 +7,10 @@ out/
 
 target
 
+sqlite.db
+
 db
+
+rocksdb
 
 **DS_Store

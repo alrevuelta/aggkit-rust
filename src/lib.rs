@@ -1,6 +1,7 @@
 pub mod api;
 pub mod cli;
 pub mod contracts;
+pub mod db;
 pub mod indexer;
 pub mod indexer_bridge;
 pub mod indexer_l1infotree;
